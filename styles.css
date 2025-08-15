@@ -1,0 +1,263 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50;
+}
+
+h2 {
+    color: #555;
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.upload-section, .column-selection, .label-setup, .classification-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+input[type="file"] {
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    width: 100%;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: #4CAF50;
+}
+
+#fileInfo {
+    margin-top: 10px;
+    color: #666;
+}
+
+.column-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-group label {
+    min-width: 150px;
+    font-weight: bold;
+}
+
+select, input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+}
+
+button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.progress {
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+#progressFill {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.current-text {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#textContent {
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+.existing-labels, .custom-labels, .selected-labels {
+    margin-bottom: 20px;
+}
+
+#existingLabelsList, #customLabelsList, #selectedLabelsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+    min-height: 30px;
+}
+
+.label {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #e1f5fe;
+    border: 1px solid #81d4fa;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.label:hover {
+    background-color: #b3e5fc;
+}
+
+.label.selected {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.label.removable {
+    background-color: #ffcdd2;
+    border-color: #f48fb1;
+}
+
+.label.removable:hover {
+    background-color: #ef5350;
+    color: white;
+}
+
+.label-output {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f1f8e9;
+    border: 1px solid #c5e1a5;
+    border-radius: 4px;
+}
+
+.label-output code {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#customLabelInput, #setupLabelInput {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.label-count {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+}
+
+.existing-labels-preview {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.add-labels-section {
+    margin-bottom: 20px;
+}
+
+#foundLabelsList, #setupCustomLabelsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+    min-height: 30px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 0;
+        padding: 10px;
+    }
+    
+    .control-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .control-group label {
+        min-width: auto;
+    }
+    
+    select, input[type="text"] {
+        min-width: auto;
+        width: 100%;
+    }
+}

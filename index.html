@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLP Text Classifier</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>NLP Text Classifier</h1>
+        
+        <div class="upload-section">
+            <h2>1. Upload CSV File</h2>
+            <input type="file" id="csvFile" accept=".csv" />
+            <div id="fileInfo"></div>
+        </div>
+
+        <div class="column-selection" id="columnSelection" style="display: none;">
+            <h2>2. Select Columns</h2>
+            <div class="column-controls">
+                <div class="control-group">
+                    <label for="textColumn">Text Column:</label>
+                    <select id="textColumn"></select>
+                </div>
+                <div class="control-group">
+                    <label for="labelColumn">Existing Labels Column (optional):</label>
+                    <select id="labelColumn">
+                        <option value="">-- None --</option>
+                    </select>
+                </div>
+                <button id="analyzeLables">Analyze Labels</button>
+            </div>
+        </div>
+
+        <div class="label-setup" id="labelSetup" style="display: none;">
+            <h2>3. Setup Labels</h2>
+            <div class="existing-labels-preview" id="existingLabelsPreview" style="display: none;">
+                <h3>Found Labels in Data:</h3>
+                <div id="foundLabelsList"></div>
+                <p class="label-count">Total: <span id="labelCount">0</span> unique labels</p>
+            </div>
+            
+            <div class="add-labels-section">
+                <h3>Add Additional Labels:</h3>
+                <input type="text" id="setupLabelInput" placeholder="Enter label and press Enter">
+                <div id="setupCustomLabelsList"></div>
+            </div>
+            
+            <button id="startClassification">Start Classification</button>
+        </div>
+
+        <div class="classification-section" id="classificationSection" style="display: none;">
+            <h2>4. Classify Text</h2>
+            <div class="progress">
+                <span id="progressText">Item 1 of 100</span>
+                <div class="progress-bar">
+                    <div id="progressFill"></div>
+                </div>
+            </div>
+            
+            <div class="current-text">
+                <h3>Text to classify:</h3>
+                <div id="textContent"></div>
+            </div>
+            
+            <div class="existing-labels" id="existingLabels" style="display: none;">
+                <h3>Existing Labels:</h3>
+                <div id="existingLabelsList"></div>
+            </div>
+            
+            <div class="custom-labels">
+                <h3>Add Custom Labels:</h3>
+                <input type="text" id="customLabelInput" placeholder="Enter label and press Enter">
+                <div id="customLabelsList"></div>
+            </div>
+            
+            <div class="selected-labels">
+                <h3>Selected Labels:</h3>
+                <div id="selectedLabelsList"></div>
+                <div class="label-output">
+                    Output: <code id="labelOutput">[]</code>
+                </div>
+            </div>
+            
+            <div class="navigation">
+                <button id="prevButton" disabled>Previous</button>
+                <button id="nextButton">Next</button>
+                <button id="exportButton" style="display: none;">Export Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
