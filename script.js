@@ -7,6 +7,8 @@ class TextClassifier {
         this.labelColumn = '';
         this.classifications = [];
         this.customLabels = new Set();
+        this.filteredIndices = [];
+        this.currentFilteredIndex = 0;
         
         this.initializeEventListeners();
     }
@@ -17,8 +19,8 @@ class TextClassifier {
         document.getElementById('startClassification').addEventListener('click', this.startClassification.bind(this));
         document.getElementById('customLabelInput').addEventListener('keypress', this.handleCustomLabelInput.bind(this));
         document.getElementById('setupLabelInput').addEventListener('keypress', this.handleSetupLabelInput.bind(this));
-        document.getElementById('prevButton').addEventListener('click', () => this.navigateToIndex(this.currentIndex - 1));
-        document.getElementById('nextButton').addEventListener('click', () => this.navigateToIndex(this.currentIndex + 1));
+        document.getElementById('prevButton').addEventListener('click', () => this.navigateToIndex(this.currentFilteredIndex - 1));
+        document.getElementById('nextButton').addEventListener('click', () => this.navigateToIndex(this.currentFilteredIndex + 1));
         document.getElementById('exportButton').addEventListener('click', this.exportResults.bind(this));
     }
     
@@ -91,6 +93,19 @@ class TextClassifier {
             document.getElementById('existingLabelsPreview').style.display = 'block';
             this.displayFoundLabels();
         }
+        
+        this.updateFilterCounts();
+    }
+    
+    updateFilterCounts() {
+        const withLabels = this.csvData.filter((_, index) => 
+            this.classifications[index] && this.classifications[index].length > 0
+        ).length;
+        const withoutLabels = this.csvData.length - withLabels;
+        
+        document.getElementById('allRowsCount').textContent = this.csvData.length;
+        document.getElementById('withLabelsCount').textContent = withLabels;
+        document.getElementById('withoutLabelsCount').textContent = withoutLabels;
     }
     
     displayFoundLabels() {
@@ -157,9 +172,25 @@ class TextClassifier {
             return;
         }
         
-        this.currentIndex = 0;
+        this.applyFilter();
+        this.currentFilteredIndex = 0;
         this.displayClassificationInterface();
         this.displayCurrentText();
+    }
+    
+    applyFilter() {
+        const filterMode = document.querySelector('input[name="filterMode"]:checked').value;
+        
+        this.filteredIndices = [];
+        for (let i = 0; i < this.csvData.length; i++) {
+            const hasLabels = this.classifications[i] && this.classifications[i].length > 0;
+            
+            if (filterMode === 'all' || 
+                (filterMode === 'with-labels' && hasLabels) ||
+                (filterMode === 'without-labels' && !hasLabels)) {
+                this.filteredIndices.push(i);
+            }
+        }
     }
     
     loadExistingLabels() {
@@ -232,17 +263,18 @@ class TextClassifier {
     }
     
     displayCurrentText() {
-        if (this.currentIndex >= this.csvData.length) {
+        if (this.currentFilteredIndex >= this.filteredIndices.length) {
             this.showExportOption();
             return;
         }
         
+        this.currentIndex = this.filteredIndices[this.currentFilteredIndex];
         const currentRow = this.csvData[this.currentIndex];
         const text = currentRow[this.textColumn];
         
         document.getElementById('textContent').textContent = text;
-        document.getElementById('progressText').textContent = `Item ${this.currentIndex + 1} of ${this.csvData.length}`;
-        document.getElementById('progressFill').style.width = `${((this.currentIndex + 1) / this.csvData.length) * 100}%`;
+        document.getElementById('progressText').textContent = `Item ${this.currentFilteredIndex + 1} of ${this.filteredIndices.length}`;
+        document.getElementById('progressFill').style.width = `${((this.currentFilteredIndex + 1) / this.filteredIndices.length) * 100}%`;
         
         this.updateSelectedLabels();
         this.updateNavigationButtons();
@@ -334,18 +366,18 @@ class TextClassifier {
         });
     }
     
-    navigateToIndex(index) {
-        if (index < 0 || index >= this.csvData.length) return;
+    navigateToIndex(filteredIndex) {
+        if (filteredIndex < 0 || filteredIndex >= this.filteredIndices.length) return;
         
-        this.currentIndex = index;
+        this.currentFilteredIndex = filteredIndex;
         this.displayCurrentText();
     }
     
     updateNavigationButtons() {
-        document.getElementById('prevButton').disabled = this.currentIndex === 0;
-        document.getElementById('nextButton').disabled = this.currentIndex >= this.csvData.length - 1;
+        document.getElementById('prevButton').disabled = this.currentFilteredIndex === 0;
+        document.getElementById('nextButton').disabled = this.currentFilteredIndex >= this.filteredIndices.length - 1;
         
-        if (this.currentIndex >= this.csvData.length - 1) {
+        if (this.currentFilteredIndex >= this.filteredIndices.length - 1) {
             document.getElementById('exportButton').style.display = 'inline-block';
         }
     }
@@ -357,9 +389,10 @@ class TextClassifier {
     }
     
     exportResults() {
+        // Always export ALL rows from original data, not just filtered ones
         const results = this.csvData.map((row, index) => ({
             ...row,
-            classifications: this.classifications[index]
+            classifications: this.classifications[index] || []
         }));
         
         const csvContent = this.convertToCSV(results);

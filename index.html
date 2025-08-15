@@ -47,6 +47,24 @@
                 <div id="setupCustomLabelsList"></div>
             </div>
             
+            <div class="filter-section">
+                <h3>Filter Items to Classify:</h3>
+                <div class="filter-options">
+                    <label>
+                        <input type="radio" name="filterMode" value="all" checked>
+                        All rows (<span id="allRowsCount">0</span>)
+                    </label>
+                    <label>
+                        <input type="radio" name="filterMode" value="with-labels">
+                        Only rows with existing labels (<span id="withLabelsCount">0</span>)
+                    </label>
+                    <label>
+                        <input type="radio" name="filterMode" value="without-labels">
+                        Only rows without labels (<span id="withoutLabelsCount">0</span>)
+                    </label>
+                </div>
+            </div>
+            
             <button id="startClassification">Start Classification</button>
         </div>
 
