@@ -26,49 +26,24 @@ class TextClassifier {
         const file = event.target.files[0];
         if (!file) return;
         
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            this.parseCSV(e.target.result);
-            this.displayFileInfo(file);
-            this.setupColumnSelection();
-        };
-        reader.readAsText(file);
-    }
-    
-    parseCSV(csvText) {
-        const lines = csvText.split('\n').filter(line => line.trim());
-        this.headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
-        
-        this.csvData = lines.slice(1).map(line => {
-            const values = this.parseCSVLine(line);
-            const row = {};
-            this.headers.forEach((header, index) => {
-                row[header] = values[index] || '';
-            });
-            return row;
-        });
-        
-        this.classifications = new Array(this.csvData.length).fill(null).map(() => []);
-    }
-    
-    parseCSVLine(line) {
-        const values = [];
-        let current = '';
-        let inQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                values.push(current.trim().replace(/"/g, ''));
-                current = '';
-            } else {
-                current += char;
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                this.parseCSVResults(results);
+                this.displayFileInfo(file);
+                this.setupColumnSelection();
+            },
+            error: (error) => {
+                alert(`Error parsing CSV: ${error.message}`);
             }
-        }
-        values.push(current.trim().replace(/"/g, ''));
-        return values;
+        });
+    }
+    
+    parseCSVResults(results) {
+        this.csvData = results.data;
+        this.headers = results.meta.fields || Object.keys(this.csvData[0] || {});
+        this.classifications = new Array(this.csvData.length).fill(null).map(() => []);
     }
     
     displayFileInfo(file) {
@@ -394,24 +369,15 @@ class TextClassifier {
     convertToCSV(data) {
         if (data.length === 0) return '';
         
-        const headers = [...this.headers, 'classifications'];
-        const csvRows = [headers.join(',')];
+        const exportData = data.map(row => ({
+            ...row,
+            classifications: JSON.stringify(row.classifications)
+        }));
         
-        data.forEach(row => {
-            const values = this.headers.map(header => {
-                const value = row[header] || '';
-                return `"${value.toString().replace(/"/g, '""')}"`;
-            });
-            
-            // Properly escape the JSON array to stay in one column
-            const jsonString = JSON.stringify(row.classifications);
-            const escapedJson = jsonString.replace(/"/g, '""');
-            values.push(`"${escapedJson}"`);
-            
-            csvRows.push(values.join(','));
+        return Papa.unparse(exportData, {
+            header: true,
+            quotes: true
         });
-        
-        return csvRows.join('\n');
     }
     
     downloadCSV(csvContent, filename) {
