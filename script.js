@@ -250,6 +250,9 @@ class TextClassifier {
             document.getElementById('existingLabels').style.display = 'block';
             this.displayExistingLabels();
         }
+        
+        // Always show export button during classification
+        document.getElementById('exportButton').style.display = 'inline-block';
     }
     
     displayExistingLabels() {
@@ -377,9 +380,7 @@ class TextClassifier {
         document.getElementById('prevButton').disabled = this.currentFilteredIndex === 0;
         document.getElementById('nextButton').disabled = this.currentFilteredIndex >= this.filteredIndices.length - 1;
         
-        if (this.currentFilteredIndex >= this.filteredIndices.length - 1) {
-            document.getElementById('exportButton').style.display = 'inline-block';
-        }
+        // Export button is always visible during classification (set in displayClassificationInterface)
     }
     
     showExportOption() {
