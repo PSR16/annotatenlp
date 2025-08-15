@@ -89,6 +89,11 @@ class TextClassifier {
     displayLabelSetup() {
         document.getElementById('labelSetup').style.display = 'block';
         
+        // Initialize existingLabels array if it doesn't exist
+        if (!this.existingLabels) {
+            this.existingLabels = [];
+        }
+        
         if (this.existingLabels && this.existingLabels.length > 0) {
             document.getElementById('existingLabelsPreview').style.display = 'block';
             this.displayFoundLabels();
@@ -251,8 +256,26 @@ class TextClassifier {
             this.displayExistingLabels();
         }
         
+        // Show custom labels during classification if any exist
+        if (this.customLabels.size > 0) {
+            this.displayCustomLabelsForClassification();
+        }
+        
         // Always show export button during classification
         document.getElementById('exportButton').style.display = 'inline-block';
+    }
+    
+    displayCustomLabelsForClassification() {
+        const container = document.getElementById('customLabelsList');
+        container.innerHTML = '';
+        
+        Array.from(this.customLabels).forEach(label => {
+            const labelElement = document.createElement('span');
+            labelElement.className = 'label';
+            labelElement.textContent = label;
+            labelElement.onclick = () => this.toggleLabel(label);
+            container.appendChild(labelElement);
+        });
     }
     
     displayExistingLabels() {
@@ -315,7 +338,14 @@ class TextClassifier {
         if (event.key === 'Enter' && event.target.value.trim()) {
             const labelText = event.target.value.trim();
             this.customLabels.add(labelText);
-            this.displayCustomLabels();
+            
+            // Also add to existing labels so it appears in the main label list
+            if (!this.existingLabels.includes(labelText)) {
+                this.existingLabels.push(labelText);
+            }
+            
+            this.displayCustomLabelsForClassification();
+            this.displayExistingLabels();
             event.target.value = '';
         }
     }
@@ -357,6 +387,17 @@ class TextClassifier {
         document.getElementById('labelOutput').textContent = JSON.stringify(currentLabels);
         
         this.updateExistingLabelsDisplay();
+        this.updateCustomLabelsDisplay();
+    }
+    
+    updateCustomLabelsDisplay() {
+        const customLabels = document.querySelectorAll('#customLabelsList .label');
+        const currentLabels = this.classifications[this.currentIndex];
+        
+        customLabels.forEach(labelEl => {
+            const isSelected = currentLabels.includes(labelEl.textContent);
+            labelEl.classList.toggle('selected', isSelected);
+        });
     }
     
     updateExistingLabelsDisplay() {
