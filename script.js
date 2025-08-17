@@ -22,6 +22,12 @@ class TextClassifier {
         document.getElementById('prevButton').addEventListener('click', () => this.navigateToIndex(this.currentFilteredIndex - 1));
         document.getElementById('nextButton').addEventListener('click', () => this.navigateToIndex(this.currentFilteredIndex + 1));
         document.getElementById('exportButton').addEventListener('click', this.exportResults.bind(this));
+        
+        // Add event listeners for filter changes
+        document.querySelectorAll('input[name="filterMode"]').forEach(radio => {
+            radio.addEventListener('change', this.handleFilterModeChange.bind(this));
+        });
+        document.getElementById('tagFilterSelect').addEventListener('change', this.updateTagFilterCount.bind(this));
     }
     
     handleFileUpload(event) {
@@ -100,6 +106,50 @@ class TextClassifier {
         }
         
         this.updateFilterCounts();
+        this.setupTagFilter();
+    }
+    
+    handleFilterModeChange() {
+        const filterMode = document.querySelector('input[name="filterMode"]:checked').value;
+        const tagFilter = document.getElementById('tagFilter');
+        
+        if (filterMode === 'with-labels') {
+            tagFilter.style.display = 'block';
+            this.setupTagFilter();
+        } else {
+            tagFilter.style.display = 'none';
+        }
+        
+        this.updateFilterCounts();
+    }
+    
+    setupTagFilter() {
+        const select = document.getElementById('tagFilterSelect');
+        select.innerHTML = '<option value="">-- Select label to filter by --</option>';
+        
+        if (this.existingLabels && this.existingLabels.length > 0) {
+            this.existingLabels.forEach(label => {
+                const option = new Option(label, label);
+                select.appendChild(option);
+            });
+        }
+        
+        this.updateTagFilterCount();
+    }
+    
+    updateTagFilterCount() {
+        const selectedTag = document.getElementById('tagFilterSelect').value;
+        const countElement = document.getElementById('tagFilterCount');
+        
+        if (selectedTag) {
+            const count = this.csvData.filter((_, index) => {
+                const labels = this.classifications[index] || [];
+                return labels.includes(selectedTag);
+            }).length;
+            countElement.textContent = `(${count} rows)`;
+        } else {
+            countElement.textContent = '';
+        }
     }
     
     updateFilterCounts() {
@@ -185,14 +235,28 @@ class TextClassifier {
     
     applyFilter() {
         const filterMode = document.querySelector('input[name="filterMode"]:checked').value;
+        const selectedTag = document.getElementById('tagFilterSelect').value;
         
         this.filteredIndices = [];
         for (let i = 0; i < this.csvData.length; i++) {
             const hasLabels = this.classifications[i] && this.classifications[i].length > 0;
+            const labels = this.classifications[i] || [];
             
-            if (filterMode === 'all' || 
-                (filterMode === 'with-labels' && hasLabels) ||
-                (filterMode === 'without-labels' && !hasLabels)) {
+            let includeRow = false;
+            
+            if (filterMode === 'all') {
+                includeRow = true;
+            } else if (filterMode === 'with-labels') {
+                includeRow = hasLabels;
+                // Additional filter by specific tag if selected
+                if (selectedTag && includeRow) {
+                    includeRow = labels.includes(selectedTag);
+                }
+            } else if (filterMode === 'without-labels') {
+                includeRow = !hasLabels;
+            }
+            
+            if (includeRow) {
                 this.filteredIndices.push(i);
             }
         }

@@ -260,6 +260,26 @@ button:disabled {
     min-width: auto;
 }
 
+.tag-filter {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.tag-filter h4 {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.filter-count {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+}
+
 #foundLabelsList, #setupCustomLabelsList {
     display: flex;
     flex-wrap: wrap;

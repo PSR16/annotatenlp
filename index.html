@@ -63,6 +63,14 @@
                         Only rows without labels (<span id="withoutLabelsCount">0</span>)
                     </label>
                 </div>
+                
+                <div class="tag-filter" id="tagFilter" style="display: none;">
+                    <h4>Filter by specific label:</h4>
+                    <select id="tagFilterSelect">
+                        <option value="">-- Select label to filter by --</option>
+                    </select>
+                    <span id="tagFilterCount" class="filter-count"></span>
+                </div>
             </div>
             
             <button id="startClassification">Start Classification</button>
